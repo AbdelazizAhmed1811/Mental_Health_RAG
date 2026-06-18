@@ -10,15 +10,19 @@ env_path = os.path.join(BASE_DIR, '.env')
 load_dotenv(env_path)
 
 class GenerateEmpatheticResponse(dspy.Signature):
-    """You are a compassionate, professional mental health chatbot. 
+    """
+    You are a compassionate, professional mental health chatbot.
     Your goal is to provide supportive, empathetic, and helpful guidance based on the provided reference conversations from real mental health counselors.
     
+    STRICT MEDICAL BAN: You are strictly forbidden from discussing medication dosages, confirming if a dose is correct, or giving medical advice. If the user mentions a specific drug or dose, you must empathetically state that you cannot discuss medication and urge them to consult their doctor.
+
     INSTRUCTIONS:
-    1. Address the user directly and validate their feelings based on their detected emotion.
-    2. Tailor your tone to be highly sensitive to the user's emotion (e.g. calming if angry, deeply empathetic if sad).
+    1. Use the reference conversations to guide your advice, but do not directly quote them or act like a human counselor.
+    2. Address the user directly and validate their feelings based on their detected emotion.
     3. Keep your response concise (3-5 sentences). Do not overwhelm the user.
     4. Do not provide medical diagnoses or prescribe medication.
-    5. You MUST generate your final response entirely in the requested target_language code.
+    5. If the situation sounds like a severe crisis, gently recommend they seek professional help or call a hotline.
+    6. You MUST generate your final response entirely in the requested target_language code.
     """
     
     retrieved_conversations = dspy.InputField(desc="Reference conversations from real mental health counselors")
@@ -47,9 +51,9 @@ class RAGService:
         
         # 3. Initialize DSPy llm Client
         api_key = os.getenv("API_KEY")
-        model_name = os.getenv("INTENT_MODEL")
+        model_name = os.getenv("RAG_MODEL")
         # Prevent llm Rate Limit by explicitly setting max_tokens
-        self.lm = dspy.LM(f'llm/{model_name}', api_key=api_key, max_tokens=12000)
+        self.lm = dspy.LM(f'groq/{model_name}', api_key=api_key, max_tokens=1000)
         dspy.configure(lm=self.lm)
         
         # Define the DSPy program
@@ -107,13 +111,48 @@ class RAGService:
 if __name__ == "__main__":
     print("Initializing DSPy RAG Service...")
     rag = RAGService()
-    test_query = "I just feel so overwhelmed with my exams coming up, I can't sleep."
-    test_emotion = "anxiety"
-    print(f"\nTest Query: {test_query}")
-    print(f"Detected Emotion: {test_emotion}\n")
-    print("Generating response (Retrieving from Qdrant -> DSPy llm)...\n")
-    response = rag.generate_response(query=test_query, emotion=test_emotion)
-    print("Bot Response:")
-    print("-" * 50)
-    print(response)
-    print("-" * 50)
+    
+    target_lang = "en" 
+    
+    # Define your test cases
+    test_cases = [
+        {
+            "emotion": "anxiety",
+            "query": "I just feel so overwhelmed with my exams coming up, I can't sleep."
+        },
+        {
+            "emotion": "joy",
+            "query": "I just found out I got the job I've been dreaming of! I'm practically jumping up and down!"
+        },
+        {
+            "emotion": "fear",
+            "query": "I have a medical scan tomorrow and I'm absolutely terrified about what the results might show."
+        },
+        {
+            "emotion": "love",
+            "query": "My partner stayed up all night helping me prep for my presentation. I just feel so incredibly grateful and connected to them right now."
+        }
+    ]
+    
+    # Run through each test case
+    for i, test in enumerate(test_cases, 1):
+        print(f"\n{'='*50}")
+        print(f"Test Case {i}: {test['emotion'].upper()}")
+        print(f"{'='*50}")
+        print(f"Test Query: {test['query']}")
+        print(f"Detected Emotion: {test['emotion']}\n")
+        print("Generating response (Retrieving from Qdrant -> DSPy llm)...\n")
+        
+        try:
+            response = rag.generate_response(
+                query=test['query'], 
+                emotion=test['emotion'], 
+                language_code=target_lang
+            )
+            
+            print("Bot Response:")
+            print("-" * 50)
+            print(response)
+            
+        except Exception as e:
+            print(f"Error generating response: {e}")

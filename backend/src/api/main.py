@@ -17,14 +17,8 @@ from src.services.emotion_classifier import EmotionClassifierService
 from src.api.static_responses import STATIC_RESPONSES
 
 # --- DSPy Integration (With Rollback) ---
-# To rollback to the old brittle prompt approach, simply comment the two lines below 
-# and uncomment the two original import lines.
-# from src.services.intent_classifier_dspy import IntentClassifierService
-# from src.services.rag_service_dspy import RAGService
-
-# --- Original Imports (Commented out for rollback) ---
-from src.services.intent_classifier import IntentClassifierService
-from src.services.rag_service import RAGService
+from src.services.intent_classifier_dspy import IntentClassifierService
+from src.services.rag_service_dspy import RAGService
 
 app = FastAPI(
     title="Mental Health RAG Chatbot API",
@@ -86,7 +80,13 @@ def chat_endpoint(request: ChatRequest):
         # STEP 2: Intent Classification
         # ==========================================
         # We classify intent based on the English query for better LLM accuracy
-        intent = intent_service.classify_intent(english_query)
+        intent_result = intent_service.classify_intent(english_query)
+        
+        # Handle both string (original) and tuple (DSPy ChainOfThought) return types
+        if isinstance(intent_result, tuple):
+            intent = intent_result[0]
+        else:
+            intent = intent_result
 
         # ==========================================
         # STEP 3 & 4: Emotion & RAG Generation
