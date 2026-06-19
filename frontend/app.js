@@ -1,17 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const chatForm      = document.getElementById("chat-form");
-    const userInput     = document.getElementById("user-input");
-    const sendBtn       = document.getElementById("send-btn");
-    const chatBox       = document.getElementById("chat-box");
-    const statusDot     = document.getElementById("status-dot");
-    const statusText    = document.getElementById("status-text");
-    const langText      = document.getElementById("lang-text");
-    const emotionText   = document.getElementById("emotion-text");
-    const emotionDot    = document.querySelector(".emotion-dot");
-    const charCount     = document.getElementById("char-count");
-    const welcomeMsg    = document.getElementById("welcome-msg");
+    const chatForm = document.getElementById("chat-form");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const chatBox = document.getElementById("chat-box");
+    const statusDot = document.getElementById("status-dot");
+    const statusText = document.getElementById("status-text");
+    const langText = document.getElementById("lang-text");
+    const emotionText = document.getElementById("emotion-text");
+    const emotionDot = document.querySelector(".emotion-dot");
+    const charCount = document.getElementById("char-count");
+    const welcomeMsg = document.getElementById("welcome-msg");
 
-    const API_URL     = "http://localhost:8000/chat";
+    const API_URL = "http://localhost:8000/chat";
 
     // ─── Language names map ───────────────────────────────
     const LANG_NAMES = {
@@ -189,8 +189,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const meta = {
-                lang:    data.detected_language,
-                intent:  data.detected_intent,
+                lang: data.detected_language,
+                intent: data.detected_intent,
                 emotion: data.detected_emotion
             };
             appendMessage(data.response, "bot", meta);
