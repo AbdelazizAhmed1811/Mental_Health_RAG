@@ -12,7 +12,7 @@ class EmotionClassifierService:
         if not self.url:
             print("WARNING: EMOTION_CLASSIFIER_URL is not set in .env. Will default to 'neutral'.")
 
-    def classify_emotion(self, text: str) -> str:
+    def classify_emotion(self, text: str, history: str = "") -> str:
         """
         Calls the external emotion classifier running on Colab via Ngrok.
         If the URL is not set or fails, gracefully falls back to 'neutral'.
@@ -21,7 +21,8 @@ class EmotionClassifierService:
             return "neutral"
             
         try:
-            response = requests.post(f"{self.url}/predict", json={"text": text}, timeout=10)
+            combined_text = f"Context: {history}\nUser: {text}" if history else text
+            response = requests.post(f"{self.url}/predict", json={"text": combined_text}, timeout=10)
             response.raise_for_status()
             
             data = response.json()

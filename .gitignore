@@ -32,3 +32,4 @@ Thumbs.db
 uv.lock
 todo.txt
 models/*
+backend/chat_history.db

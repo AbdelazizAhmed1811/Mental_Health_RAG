@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const welcomeMsg = document.getElementById("welcome-msg");
 
     const API_URL = window.location.origin + "/chat";
+    const SESSION_ID = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
 
     // ─── Language names map ───────────────────────────────
     const LANG_NAMES = {
@@ -174,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const res = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query: text })
+                body: JSON.stringify({ query: text, session_id: SESSION_ID })
             });
 
             if (!res.ok) {
