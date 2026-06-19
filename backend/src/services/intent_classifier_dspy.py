@@ -1,6 +1,7 @@
 import os
 import dspy
 from dotenv import load_dotenv
+from langsmith import traceable
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 env_path = os.path.join(BASE_DIR, '.env')
@@ -36,6 +37,7 @@ class IntentClassifierService:
         self.classifier = dspy.ChainOfThought(IntentClassification)
 
 
+    @traceable(name="Intent Classification (DSPy)")
     def classify_intent(self, text: str) -> tuple[str, str]:
         """
         Classifies the intent of the user prompt and returns (intent, rationale).

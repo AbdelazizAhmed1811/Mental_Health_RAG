@@ -3,7 +3,7 @@ import dspy
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
-
+from langsmith import traceable
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 env_path = os.path.join(BASE_DIR, '.env')
@@ -81,6 +81,7 @@ class RAGService:
             
         return context_str
 
+    @traceable(name="Empathetic RAG Generator")
     def generate_response(self, query: str, emotion: str, language_code: str) -> str:
         """
         Generate a response based on the query, emotion, target language.
