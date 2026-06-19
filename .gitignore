@@ -1,0 +1,15 @@
+backend/src/__pycache__/__init__.cpython-312.pyc
+backend/src/api/__pycache__/__init__.cpython-312.pyc
+backend/src/api/__pycache__/main.cpython-312.pyc
+backend/src/api/__pycache__/static_responses.cpython-312.pyc
+backend/src/services/__pycache__/__init__.cpython-312.pyc
+backend/src/services/__pycache__/emotion_classifier.cpython-312.pyc
+backend/src/services/__pycache__/intent_classifier_dspy.cpython-312.pyc
+backend/src/services/__pycache__/intent_classifier.cpython-312.pyc
+backend/src/services/__pycache__/rag_service_dspy.cpython-312.pyc
+backend/src/services/__pycache__/rag_service.cpython-312.pyc
+backend/src/services/__pycache__/translator.cpython-312.pyc
+backend/src/utils/__pycache__/__init__.cpython-312.pyc
+backend/src/utils/__pycache__/preprocessing.cpython-312.pyc
+models/language_classification_pipeline.joblib
+todo.txt
