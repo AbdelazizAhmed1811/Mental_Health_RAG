@@ -135,4 +135,5 @@ def chat_endpoint(request: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- Serve Frontend Static Files ---
-app.mount("/", StaticFiles(directory=os.path.join(BASE_DIR, "frontend"), html=True), name="frontend")
+FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
