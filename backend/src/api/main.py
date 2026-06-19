@@ -132,7 +132,8 @@ def chat_endpoint(request: ChatRequest):
         # Save to history
         if request.session_id:
             bot_english = translator_service.process_prompt(final_response)["english_text"]
-            crud.add_conversation_turn(db, request.session_id, english_query, bot_english)
+            if intent == "asking_mental_health_question":
+                crud.add_conversation_turn(db, request.session_id, english_query, bot_english)
 
         # Return the comprehensive payload
         return ChatResponse(
