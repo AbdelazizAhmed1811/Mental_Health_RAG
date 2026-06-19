@@ -1,3 +1,13 @@
+---
+title: Mental Health RAG Chatbot
+emoji: 🌿
+colorFrom: green
+colorTo: blue
+sdk: docker
+app_file: Dockerfile
+pinned: false
+---
+
 # 🧠 Mental Health Companion Chatbot
 
 <div align="center">
