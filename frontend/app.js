@@ -13,8 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const charCount = document.getElementById("char-count");
     const welcomeMsg = document.getElementById("welcome-msg");
 
-    const API_URL = window.location.origin + "/chat";
-    const SESSION_ID = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
+    const isLocalDev = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const API_URL = isLocalDev ? "http://localhost:8000/chat" : window.location.origin + "/chat";
+    let SESSION_ID = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
+
+    // Update the UI with the initial session ID
+    if (sessionDisplay) sessionDisplay.textContent = SESSION_ID.split('-')[0];
 
     // ─── Language names map ───────────────────────────────
     const LANG_NAMES = {
@@ -136,6 +140,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const scrollToBottom = () => {
         chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "smooth" });
     };
+
+    // ─── New Session functionality ────────────────────────
+    if (newSessionBtn) {
+        newSessionBtn.addEventListener("click", () => {
+            // Generate a new Session ID
+            SESSION_ID = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
+            if (sessionDisplay) sessionDisplay.textContent = SESSION_ID.split('-')[0];
+            
+            // Clear the chat box but keep the welcome message
+            chatBox.innerHTML = '';
+            if (welcomeMsg) chatBox.appendChild(welcomeMsg);
+            
+            // Reset status and emotion badges
+            resetEmotionBadge();
+            if (langText) langText.textContent = "—";
+            
+            // Optionally, focus input
+            userInput.value = "";
+            charCount.textContent = "0";
+            userInput.focus();
+        });
+    }
 
     // ─── Textarea auto-grow ───────────────────────────────
     userInput.addEventListener("input", () => {

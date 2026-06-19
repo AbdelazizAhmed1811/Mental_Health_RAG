@@ -184,7 +184,7 @@ class RAGService:
             context_str += f"\n--- Reference Conversation {i+1} ---\n"
             context_str += f"User Issue: {user_context}\n"
             context_str += f"Counselor Response: {counselor_response}\n"
-        print(context_str)
+        # print(context_str)
         return context_str
 
     @traceable(name="Empathetic RAG Generator")
