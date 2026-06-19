@@ -32,7 +32,7 @@ COPY frontend/ ./frontend/
 # The model is NOT stored in the GitHub repo (it's ~15MB).
 # gdown downloads it directly into the image during the build on Render/HF.
 RUN mkdir -p /app/backend/models && \
-    gdown --id 1d1F4mkjGoYHOCOA9cJd2GL7w7BT9Nfg1 \
+    gdown 1d1F4mkjGoYHOCOA9cJd2GL7w7BT9Nfg1 \
           -O /app/backend/models/language_classification_pipeline.joblib
 
 # ─── Set the path to the language model inside the container ─────────────────
