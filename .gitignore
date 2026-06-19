@@ -13,3 +13,6 @@ backend/src/utils/__pycache__/__init__.cpython-312.pyc
 backend/src/utils/__pycache__/preprocessing.cpython-312.pyc
 models/language_classification_pipeline.joblib
 todo.txt
+backend/.env
+models/
+__pycache__/
