@@ -13,7 +13,7 @@ echo -e "${BLUE}==========================================${NC}"
 # Kill any existing processes on the ports to avoid conflicts
 echo "Cleaning up any old processes..."
 fuser -k 8000/tcp 2>/dev/null
-fuser -k 8080/tcp 2>/dev/null
+fuser -k 8082/tcp 2>/dev/null
 
 # Start the backend in the background
 echo -e "${GREEN}Starting backend server on port 8000...${NC}"
@@ -23,15 +23,15 @@ BACKEND_PID=$!
 cd ..
 
 # Start the frontend in the background
-echo -e "${GREEN}Starting frontend server on port 8080...${NC}"
+echo -e "${GREEN}Starting frontend server on port 8082...${NC}"
 cd frontend
-python3 -m http.server 8080 &
+python3 -m http.server 8082 &
 FRONTEND_PID=$!
 cd ..
 
 echo -e "${BLUE}==========================================${NC}"
 echo -e "${GREEN}✅ App is now running!${NC}"
-echo -e "${GREEN}🌐 Frontend UI: http://localhost:8080${NC}"
+echo -e "${GREEN}🌐 Frontend UI: http://localhost:8082${NC}"
 echo -e "${GREEN}⚙️  Backend API: http://localhost:8000${NC}"
 echo -e "${RED}Press Ctrl+C to stop both servers safely.${NC}"
 echo -e "${BLUE}==========================================${NC}"

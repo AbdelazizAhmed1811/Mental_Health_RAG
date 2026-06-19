@@ -40,6 +40,25 @@ class RAGService:
             
         self.qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
         self.collection_name = "mental_health_counseling"
+        self.retrieval_mode = os.getenv("RETRIEVAL_MODE", "hybrid").lower()
+        
+        # Register text payload index on 'context' field for keyword/hybrid matching
+        try:
+            from qdrant_client.http import models
+            self.qdrant_client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="context",
+                field_schema=models.TextIndexParams(
+                    type=models.TextIndexType.TEXT,
+                    tokenizer=models.TokenizerType.WORD,
+                    lowercase=True,
+                    max_token_len=15,
+                    min_token_len=2
+                )
+            )
+            print("Payload text index on 'context' registered successfully or already exists.")
+        except Exception as e:
+            print(f"Warning: Could not create payload text index: {e}")
         
         # 2. Initialize Embedding Model
         print("Loading embedding model (all-MiniLM-L6-v2)...")
@@ -49,24 +68,112 @@ class RAGService:
         api_key = os.getenv("API_KEY")
         model_name = os.getenv("INTENT_MODEL")
         # Prevent llm Rate Limit by explicitly setting max_tokens
-        self.lm = dspy.LM(f'llm/{model_name}', api_key=api_key, max_tokens=12000)
+        self.lm = dspy.LM(f'groq/{model_name}', api_key=api_key, max_tokens=15000)
         dspy.configure(lm=self.lm)
         
         # Define the DSPy program
         self.generator = dspy.Predict(GenerateEmpatheticResponse)
         
     def _retrieve_context(self, query: str, top_k: int = 3) -> str:
-        """Embeds the query and retrieves top_k most similar contexts from Qdrant."""
-        query_vector = self.embedding_model.encode(query).tolist()
-        
-        search_results = self.qdrant_client.query_points(
-            collection_name=self.collection_name,
-            query=query_vector,
-            limit=top_k
-        ).points
-        
+        """
+        Retrieves top_k most similar contexts from Qdrant using the configured retrieval mode.
+        Supports: 'dense', 'keyword', and 'hybrid'.
+        """
+        from qdrant_client.http import models
+
+        results = []
+
+        if self.retrieval_mode == "dense":
+            # Pure Dense Vector Similarity Search
+            query_vector = self.embedding_model.encode(query).tolist()
+            results = self.qdrant_client.query_points(
+                collection_name=self.collection_name,
+                query=query_vector,
+                limit=top_k
+            ).points
+
+        elif self.retrieval_mode == "keyword":
+            # Pure Keyword / Full-text Search
+            results = self.qdrant_client.scroll(
+                collection_name=self.collection_name,
+                scroll_filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="context",
+                            match=models.MatchText(text=query)
+                        )
+                    ]
+                ),
+                limit=top_k,
+                with_payload=True,
+                with_vectors=False
+            )[0]
+
+        elif self.retrieval_mode == "hybrid":
+            # Hybrid Search via Reciprocal Rank Fusion (RRF) on Dense and Keyword results
+            # 1. Fetch dense candidates
+            query_vector = self.embedding_model.encode(query).tolist()
+            dense_results = self.qdrant_client.query_points(
+                collection_name=self.collection_name,
+                query=query_vector,
+                limit=20
+            ).points
+
+            # 2. Fetch keyword candidates
+            keyword_results = self.qdrant_client.scroll(
+                collection_name=self.collection_name,
+                scroll_filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="context",
+                            match=models.MatchText(text=query)
+                        )
+                    ]
+                ),
+                limit=20,
+                with_payload=True,
+                with_vectors=False
+            )[0]
+
+            # 3. Apply Reciprocal Rank Fusion (RRF)
+            # RRF Score = sum( 1 / (k + rank) ) where k is a constant (usually 60)
+            rrf_scores = {}
+            rrf_constant = 60
+
+            # Rank dense results
+            for rank, hit in enumerate(dense_results):
+                rrf_scores[hit.id] = {
+                    "hit": hit,
+                    "score": 1.0 / (rrf_constant + rank + 1)
+                }
+
+            # Rank keyword results
+            for rank, hit in enumerate(keyword_results):
+                if hit.id in rrf_scores:
+                    rrf_scores[hit.id]["score"] += 1.0 / (rrf_constant + rank + 1)
+                else:
+                    rrf_scores[hit.id] = {
+                        "hit": hit,
+                        "score": 1.0 / (rrf_constant + rank + 1)
+                    }
+
+            # Sort by fused score and take top_k
+            sorted_rrf = sorted(rrf_scores.values(), key=lambda x: x["score"], reverse=True)
+            results = [item["hit"] for item in sorted_rrf[:top_k]]
+
+        else:
+            # Fallback to dense if unknown mode
+            print(f"Warning: Unknown retrieval mode '{self.retrieval_mode}'. Falling back to 'dense'.")
+            query_vector = self.embedding_model.encode(query).tolist()
+            results = self.qdrant_client.query_points(
+                collection_name=self.collection_name,
+                query=query_vector,
+                limit=top_k
+            ).points
+
+        # Format the retrieved results into a readable string for the LLM
         context_str = ""
-        for i, hit in enumerate(search_results):
+        for i, hit in enumerate(results):
             payload = hit.payload
             user_context = payload.get("context", "")
             counselor_response = payload.get("response", "")
@@ -74,10 +181,10 @@ class RAGService:
             context_str += f"\n--- Reference Conversation {i+1} ---\n"
             context_str += f"User Issue: {user_context}\n"
             context_str += f"Counselor Response: {counselor_response}\n"
-            
+        print(context_str)
         return context_str
 
-    def generate_response(self, query: str, emotion: str, language_code: str) -> str:
+    def generate_response(self, query: str, emotion: str, language_code: str = "en") -> str:
         """
         Generate a response based on the query, emotion, target language.
         """
@@ -107,7 +214,7 @@ class RAGService:
 if __name__ == "__main__":
     print("Initializing DSPy RAG Service...")
     rag = RAGService()
-    test_query = "I just feel so overwhelmed with my exams coming up, I can't sleep."
+    test_query = "I am having insomnia, I can't sleep."
     test_emotion = "anxiety"
     print(f"\nTest Query: {test_query}")
     print(f"Detected Emotion: {test_emotion}\n")
