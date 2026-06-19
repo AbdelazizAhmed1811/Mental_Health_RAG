@@ -7,6 +7,8 @@ sys.path.append(BASE_DIR)
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 
@@ -131,3 +133,6 @@ def chat_endpoint(request: ChatRequest):
         # If any internal service fails, bubble up a 500
         print(f"Chat Endpoint Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# --- Serve Frontend Static Files ---
+app.mount("/", StaticFiles(directory=os.path.join(BASE_DIR, "frontend"), html=True), name="frontend")

@@ -8,18 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const langText = document.getElementById("lang-text");
     const emotionText = document.getElementById("emotion-text");
     const emotionDot = document.querySelector(".emotion-dot");
+    const sessionDisplay = document.getElementById("session-id-display");
+    const newSessionBtn = document.getElementById("new-session-btn");
     const charCount = document.getElementById("char-count");
     const welcomeMsg = document.getElementById("welcome-msg");
 
-    const API_URL = "http://localhost:8000/chat";
+    const API_URL = window.location.origin + "/chat";
 
     // ─── Language names map ───────────────────────────────
-    const LANG_NAMES = {
-        en: "English", ar: "Arabic", fr: "French", de: "German",
-        es: "Spanish", it: "Italian", pt: "Portuguese", ru: "Russian",
-        zh: "Chinese", ja: "Japanese", ko: "Korean", tr: "Turkish",
-        nl: "Dutch", pl: "Polish", sv: "Swedish", unknown: "Unknown"
-    };
     const EMOTION_CLASSES = ["joy", "sadness", "anxiety", "anger", "fear", "neutral"];
 
     const updateEmotionBadge = (emotion) => {

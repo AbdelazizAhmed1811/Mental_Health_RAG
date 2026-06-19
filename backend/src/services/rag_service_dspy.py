@@ -72,7 +72,7 @@ class RAGService:
         api_key = os.getenv("API_KEY")
         model_name = os.getenv("RAG_MODEL")
         # Prevent llm Rate Limit by explicitly setting max_tokens
-        self.lm = dspy.LM(f'groq/{model_name}', api_key=api_key, max_tokens=15000)
+        self.lm = dspy.LM(f'groq/{model_name}', api_key=api_key, max_tokens=1000)
         dspy.configure(lm=self.lm)
         
         # Define the DSPy program
