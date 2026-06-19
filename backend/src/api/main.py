@@ -20,6 +20,12 @@ from src.api.static_responses import STATIC_RESPONSES
 from src.services.intent_classifier_dspy import IntentClassifierService
 from src.services.rag_service_dspy import RAGService
 
+from src.db.database import SessionLocal, init_db
+from src.db import crud
+
+# Initialize DB
+init_db()
+
 app = FastAPI(
     title="Mental Health RAG Chatbot API",
     description="A complete pipeline integrating translation, intent routing, emotion detection, and Qdrant RAG.",
@@ -49,6 +55,7 @@ except Exception as e:
 # --- Pydantic Models ---
 class ChatRequest(BaseModel):
     query: str
+    session_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str
@@ -63,11 +70,15 @@ def health_check():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat_endpoint(request: ChatRequest):
+    db = SessionLocal()
     try:
         raw_query = PreprocessingService.preprocess_query(request.query)
         
         if not raw_query.strip():
             raise HTTPException(status_code=400, detail="Query cannot be empty.")
+
+        # Fetch recent history
+        history_str = crud.get_recent_history(db, request.session_id) if request.session_id else ""
 
         # ==========================================
         # STEP 1: Language Detection & Translation
@@ -80,7 +91,7 @@ def chat_endpoint(request: ChatRequest):
         # STEP 2: Intent Classification
         # ==========================================
         # We classify intent based on the English query for better LLM accuracy
-        intent_result = intent_service.classify_intent(english_query)
+        intent_result = intent_service.classify_intent(english_query, history=history_str)
         
         # Handle both string (original) and tuple (DSPy ChainOfThought) return types
         if isinstance(intent_result, tuple):
@@ -96,13 +107,14 @@ def chat_endpoint(request: ChatRequest):
         
         if intent == "asking_mental_health_question":
             # Detect emotion
-            emotion = emotion_service.classify_emotion(english_query)
+            emotion = emotion_service.classify_emotion(english_query, history=history_str)
             
             # Generate empathetic response natively in the target language using Qdrant + llm
             final_response = rag_service.generate_response(
                 query=english_query, 
                 emotion=emotion, 
-                language_code=source_language
+                language_code=source_language,
+                history=history_str
             )
         else:
             # Handle static intents without RAG
@@ -116,6 +128,11 @@ def chat_endpoint(request: ChatRequest):
                 final_response = translator_service.translate_response(english_static, target_lang=source_language)
 
 
+
+        # Save to history
+        if request.session_id:
+            bot_english = translator_service.process_prompt(final_response)["english_text"]
+            crud.add_conversation_turn(db, request.session_id, english_query, bot_english)
 
         # Return the comprehensive payload
         return ChatResponse(
@@ -131,3 +148,5 @@ def chat_endpoint(request: ChatRequest):
         # If any internal service fails, bubble up a 500
         print(f"Chat Endpoint Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()

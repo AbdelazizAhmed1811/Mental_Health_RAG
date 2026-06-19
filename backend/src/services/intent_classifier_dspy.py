@@ -17,6 +17,7 @@ class IntentClassification(dspy.Signature):
     4. goodbye: Bye, see you.
     5. gratitude: Thank you.
     """
+    conversation_history = dspy.InputField(desc="Recent conversation history between User and Bot")
     user_message = dspy.InputField(desc="The message from the user")
     intent = dspy.OutputField(desc="Exactly one of the allowed categories in lowercase")
 
@@ -38,7 +39,7 @@ class IntentClassifierService:
 
 
     @traceable(name="Intent Classification (DSPy)")
-    def classify_intent(self, text: str) -> tuple[str, str]:
+    def classify_intent(self, text: str, history: str = "") -> tuple[str, str]:
         """
         Classifies the intent of the user prompt and returns (intent, rationale).
         """
@@ -48,7 +49,7 @@ class IntentClassifierService:
 
         try:
             with dspy.context(lm=self.lm):
-                response = self.classifier(user_message=text)
+                response = self.classifier(conversation_history=history, user_message=text)
                 intent = response.intent.strip().lower()
                 
                 # FIXED: Checking for 'reasoning' to support the latest DSPy updates

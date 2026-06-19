@@ -24,12 +24,11 @@ class GenerateEmpatheticResponse(dspy.Signature):
     5. If the situation sounds like a severe crisis, gently recommend they seek professional help or call a hotline.
     6. You MUST generate your final response entirely in the requested target_language code.
     """
-    
     retrieved_conversations = dspy.InputField(desc="Reference conversations from real mental health counselors")
+    conversation_history = dspy.InputField(desc="Recent conversation history between the user and you (the counselor)")
     user_emotion = dspy.InputField(desc="The user's current emotional state")
     user_message = dspy.InputField(desc="The user's query")
     target_language = dspy.InputField(desc="The language code to generate the response in (e.g., 'en', 'es', 'ar')")
-
     
     response = dspy.OutputField(desc="An empathetic, helpful response in the requested target language")
 
@@ -72,7 +71,7 @@ class RAGService:
         api_key = os.getenv("API_KEY")
         model_name = os.getenv("RAG_MODEL")
         # Prevent llm Rate Limit by explicitly setting max_tokens
-        self.lm = dspy.LM(f'groq/{model_name}', api_key=api_key, max_tokens=15000)
+        self.lm = dspy.LM(f'groq/{model_name}', api_key=api_key, max_tokens=1000)
         dspy.configure(lm=self.lm)
         
         # Define the DSPy program
@@ -189,9 +188,9 @@ class RAGService:
         return context_str
 
     @traceable(name="Empathetic RAG Generator")
-    def generate_response(self, query: str, emotion: str, language_code: str) -> str:
+    def generate_response(self, query: str, emotion: str, language_code: str, history: str = "") -> str:
         """
-        Generate a response based on the query, emotion, target language.
+        Generate a response based on the query, emotion, target language, and conversation history.
         """
         try:
             # 1. Retrieve relevant context from Qdrant
@@ -204,6 +203,7 @@ class RAGService:
             with dspy.context(lm=self.lm):
                 response = self.generator(
                     retrieved_conversations=context_string,
+                    conversation_history=history,
                     user_emotion=emotion.upper() if emotion else "UNKNOWN",
                     user_message=query,
 
