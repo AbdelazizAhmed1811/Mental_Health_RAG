@@ -1,0 +1,30 @@
+# ─── Python cache ────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ─── Secrets — NEVER bake these into the image ───────────────────────────────
+.env
+.env.*
+
+# ─── Virtual environments ────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+.uv/
+
+# ─── Dev & test files (not needed in production image) ───────────────────────
+tests/
+scripts/
+*.test.py
+
+# ─── Editor and OS junk ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# ─── uv lock file (dev tool, not needed inside container) ────────────────────
+uv.lock
