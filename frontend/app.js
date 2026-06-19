@@ -16,6 +16,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const API_URL = window.location.origin + "/chat";
 
     // ─── Language names map ───────────────────────────────
+    const LANG_NAMES = {
+        "en": "English", "es": "Spanish", "ar": "Arabic", "fr": "French", "de": "German",
+        "zh": "Chinese", "hi": "Hindi", "bn": "Bengali", "pt": "Portuguese", "ru": "Russian",
+        "ja": "Japanese", "pa": "Punjabi", "mr": "Marathi", "te": "Telugu", "tr": "Turkish",
+        "ko": "Korean", "vi": "Vietnamese", "ta": "Tamil", "it": "Italian", "ur": "Urdu",
+        "nl": "Dutch", "pl": "Polish", "uk": "Ukrainian", "fa": "Persian", "ro": "Romanian",
+        "el": "Greek", "cs": "Czech", "sv": "Swedish", "hu": "Hungarian", "th": "Thai",
+        "id": "Indonesian", "fi": "Finnish", "da": "Danish", "he": "Hebrew", "no": "Norwegian",
+        "sk": "Slovak", "hr": "Croatian", "ms": "Malay", "bg": "Bulgarian", "sr": "Serbian"
+    };
     const EMOTION_CLASSES = ["joy", "sadness", "anxiety", "anger", "fear", "neutral"];
 
     const updateEmotionBadge = (emotion) => {
