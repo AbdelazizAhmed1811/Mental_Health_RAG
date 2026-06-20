@@ -107,33 +107,32 @@ def chat_endpoint(request: ChatRequest):
         final_response = ""
         emotion = None
         
+        bot_english = ""
         if intent == "asking_mental_health_question":
             # Detect emotion
             emotion = emotion_service.classify_emotion(english_query, history=history_str)
             
-            # Generate empathetic response natively in the target language using Qdrant + llm
-            final_response = rag_service.generate_response(
+            # Generate empathetic response natively in English using Qdrant + LLM
+            bot_english = rag_service.generate_response(
                 query=english_query, 
                 emotion=emotion, 
-                language_code=source_language,
                 history=history_str
             )
+            # Translate to user's native language
+            final_response = translator_service.translate_response(bot_english, target_lang=source_language)
         else:
             # Handle static intents without RAG
+            bot_english = STATIC_RESPONSES["en"].get(intent, STATIC_RESPONSES["en"]["out_of_scope"])
             if source_language in STATIC_RESPONSES:
                 # Use the hardcoded response if we have it for this language
                 lang_dict = STATIC_RESPONSES[source_language]
                 final_response = lang_dict.get(intent, lang_dict["out_of_scope"])
             else:
                 # Fallback to translation if it's a language we didn't hardcode
-                english_static = STATIC_RESPONSES["en"].get(intent, STATIC_RESPONSES["en"]["out_of_scope"])
-                final_response = translator_service.translate_response(english_static, target_lang=source_language)
-
-
+                final_response = translator_service.translate_response(bot_english, target_lang=source_language)
 
         # Save to history
         if request.session_id:
-            bot_english = translator_service.process_prompt(final_response)["english_text"]
             if intent == "asking_mental_health_question":
                 crud.add_conversation_turn(db, request.session_id, english_query, bot_english)
 

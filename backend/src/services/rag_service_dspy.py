@@ -22,15 +22,13 @@ class GenerateEmpatheticResponse(dspy.Signature):
     3. Keep your response concise (3-5 sentences). Do not overwhelm the user.
     4. Do not provide medical diagnoses or prescribe medication.
     5. If the situation sounds like a severe crisis, gently recommend they seek professional help or call a hotline.
-    6. You MUST generate your final response entirely in the requested target_language code.
     """
     retrieved_conversations = dspy.InputField(desc="Reference conversations from real mental health counselors")
     conversation_history = dspy.InputField(desc="Recent conversation history between the user and you (the counselor)")
     user_emotion = dspy.InputField(desc="The user's current emotional state")
     user_message = dspy.InputField(desc="The user's query")
-    target_language = dspy.InputField(desc="The language code to generate the response in (e.g., 'en', 'es', 'ar')")
     
-    response = dspy.OutputField(desc="An empathetic, helpful response in the requested target language")
+    response = dspy.OutputField(desc="An empathetic, helpful response in English")
 
 class RAGService:
     def __init__(self):
@@ -188,9 +186,9 @@ class RAGService:
         return context_str
 
     @traceable(name="Empathetic RAG Generator")
-    def generate_response(self, query: str, emotion: str, language_code: str, history: str = "") -> str:
+    def generate_response(self, query: str, emotion: str, history: str = "") -> str:
         """
-        Generate a response based on the query, emotion, target language, and conversation history.
+        Generate a response in English based on the query, emotion, and conversation history.
         """
         try:
             # 1. Retrieve relevant context from Qdrant
@@ -205,9 +203,7 @@ class RAGService:
                     retrieved_conversations=context_string,
                     conversation_history=history,
                     user_emotion=emotion.upper() if emotion else "UNKNOWN",
-                    user_message=query,
-
-                    target_language=language_code
+                    user_message=query
                 )
                 
             return response.response
