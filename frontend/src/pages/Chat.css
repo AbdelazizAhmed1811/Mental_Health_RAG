@@ -118,6 +118,11 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+.session-item.active {
+  border-left: 3px solid var(--primary-light);
+  background: linear-gradient(90deg, rgba(58, 175, 169, 0.15) 0%, transparent 100%);
+}
+
 .session-item .emotion-dot {
   width: 8px;
   height: 8px;
@@ -354,6 +359,15 @@
 }
 
 /* Welcome */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .welcome-msg {
   display: flex;
   flex-direction: column;
@@ -512,4 +526,94 @@
   .chat-input-area {
     padding: 12px 16px 16px;
   }
+}
+
+/* ─── Chat Message Component Styles ─────────────────── */
+.message {
+  display: flex;
+  gap: 16px;
+  max-width: 85%;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.message.user-message {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message.bot-message {
+  align-self: flex-start;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.bot-avatar {
+  background: var(--primary-pale);
+  color: var(--primary);
+}
+
+.user-avatar {
+  background: var(--primary);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.message-content {
+  padding: 16px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.user-message .message-content {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  border-top-right-radius: 4px;
+}
+
+.bot-message .message-content {
+  background: white;
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-top-left-radius: 4px;
+}
+
+.message-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  gap: 10px;
+}
+
+.user-message .message-meta {
+  justify-content: flex-end;
+  color: rgba(255,255,255,0.8);
+}
+
+.bot-message .message-meta {
+  color: var(--text-muted);
+}
+
+.meta-pill {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.7rem;
 }

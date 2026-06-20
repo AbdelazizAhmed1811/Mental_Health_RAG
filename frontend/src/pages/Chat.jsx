@@ -155,6 +155,13 @@ export default function Chat() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
+  const handleInputResize = (e) => {
+    setInput(e.target.value)
+    // Auto-resize magic
+    e.target.style.height = 'auto'
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`
+  }
+
   return (
     <div className="chat-app">
       {/* ─── Sidebar ────────────────────────── */}
@@ -252,7 +259,7 @@ export default function Chat() {
             <textarea
               ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputResize}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault()
@@ -261,6 +268,7 @@ export default function Chat() {
               }}
               placeholder="Share how you're feeling... (any language)"
               rows={1}
+              style={{ height: 'auto' }}
               disabled={isLoading}
             />
             <button type="submit" className="send-btn" disabled={!input.trim() || isLoading}>
