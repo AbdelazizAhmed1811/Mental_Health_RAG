@@ -1,115 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A confidential AI mental health companion. Share how you feel — available in 20 languages.">
-    <title>Companion — AI Mental Health Support</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <div class="logo-icon">🌿</div>
-                <div class="logo-title">
-                    <h2>Companion</h2>
-                    <span class="logo-tagline">Mental Health AI</span>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <div class="nav-item active">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                    <span>ID: <span id="session-id-display"></span></span>
-                </div>
-                <div class="nav-item" id="new-session-btn" style="cursor: pointer; margin-top: 8px;">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-                    <span>New Session</span>
-                </div>
-            </nav>
-
-
-            <div class="emotion-tracker">
-                <div class="emotion-tracker-label">Last Detected Mood</div>
-                <div class="emotion-badge" id="emotion-badge">
-                    <span class="emotion-dot"></span>
-                    <span id="emotion-text">—</span>
-                </div>
-            </div>
-
-            <div class="sidebar-features">
-                <div class="feature-item">
-                    <span class="feature-icon">🌍</span>
-                    <span>20+ Languages</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🔒</span>
-                    <span>Anonymous Sessions</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">📚</span>
-                    <span>Evidence-Based RAG</span>
-                </div>
-            </div>
-
-            <div class="sidebar-footer">
-                <p>I am an AI, not a licensed therapist.</p>
-                <p>In a crisis, call <strong>emergency services</strong>.</p>
-            </div>
-        </aside>
-
-        <!-- Main Chat Area -->
-        <main class="chat-container">
-            <!-- Header -->
-            <header class="chat-header">
-                <div class="header-info">
-                    <h1>AI Support Chat</h1>
-                    <span class="status">
-                        <span class="status-dot" id="status-dot"></span>
-                        <span id="status-text">Online</span>
-                    </span>
-                </div>
-                <div class="header-actions">
-                    <div class="lang-badge" id="lang-badge" title="Detected language">🌐 <span id="lang-text">—</span></div>
-                </div>
-            </header>
-
-            <!-- Chat Messages -->
-            <div class="chat-box" id="chat-box">
-                <!-- Welcome Message -->
-                <div class="message bot-message" id="welcome-msg">
-                    <div class="avatar bot-avatar">🌿</div>
-                    <div class="message-content">
-                        <p>Hello! I'm your safe space — here to listen and support your mental well-being. Feel free to share how you're feeling. I understand <strong>20+ languages</strong>, so speak naturally.</p>
-                        <span class="timestamp">Just now</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Input Area -->
-            <div class="input-container">
-                <form id="chat-form" class="input-form">
-                    <textarea id="user-input" placeholder="Share how you're feeling... (any language)" autocomplete="off" rows="1"></textarea>
-                    <button type="submit" id="send-btn" disabled title="Send message">
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
-                </form>
-                <div class="input-meta">
-                    <span class="char-count" id="char-count"></span>
-                    <span class="disclaimer">Private session • AI companion, not a doctor</span>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

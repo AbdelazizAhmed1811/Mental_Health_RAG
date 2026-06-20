@@ -33,3 +33,10 @@ uv.lock
 todo.txt
 models/*
 backend/chat_history.db
+
+# ─── Frontend & Node.js ──────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend_old/

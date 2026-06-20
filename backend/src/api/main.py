@@ -24,6 +24,7 @@ from src.services.rag_service_dspy import RAGService
 
 from src.db.database import SessionLocal, init_db
 from src.db import crud
+from src.api import auth
 
 # Initialize DB
 init_db()
@@ -41,6 +42,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- Include Routers ---
+app.include_router(auth.router)
 
 # --- Service Initialization ---
 # We initialize these globally so they are loaded once when the server starts
@@ -70,9 +74,35 @@ class ChatResponse(BaseModel):
 def health_check():
     return {"status": "healthy"}
 
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from typing import Optional
+
+# Optional Auth dependency for chat
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token", auto_error=False)
+def get_optional_user(token: str = Depends(oauth2_scheme), db: SessionLocal = Depends(auth.get_db)):
+    if token:
+        try:
+            return auth.get_current_user(token, db)
+        except HTTPException:
+            pass
+    return None
+
+@app.get("/api/sessions", tags=["sessions"])
+def get_sessions(current_user = Depends(auth.get_current_user), db = Depends(auth.get_db)):
+    return crud.get_user_sessions(db, current_user.id)
+
+@app.get("/api/sessions/{session_id}", tags=["sessions"])
+def get_session(session_id: str, current_user = Depends(auth.get_current_user), db = Depends(auth.get_db)):
+    return crud.get_session_messages(db, session_id, current_user.id)
+
+@app.delete("/api/sessions/{session_id}", tags=["sessions"])
+def delete_session(session_id: str, current_user = Depends(auth.get_current_user), db = Depends(auth.get_db)):
+    crud.delete_session(db, session_id, current_user.id)
+    return {"status": "deleted"}
+
 @app.post("/chat", response_model=ChatResponse)
-def chat_endpoint(request: ChatRequest):
-    db = SessionLocal()
+def chat_endpoint(request: ChatRequest, current_user = Depends(get_optional_user), db = Depends(auth.get_db)):
     try:
         raw_query = PreprocessingService.preprocess_query(request.query)
         
@@ -133,8 +163,8 @@ def chat_endpoint(request: ChatRequest):
 
         # Save to history
         if request.session_id:
-            if intent == "asking_mental_health_question":
-                crud.add_conversation_turn(db, request.session_id, english_query, bot_english)
+            user_id = current_user.id if current_user else None
+            crud.add_conversation_turn(db, request.session_id, english_query, bot_english, user_id, emotion)
 
         # Return the comprehensive payload
         return ChatResponse(
@@ -151,10 +181,21 @@ def chat_endpoint(request: ChatRequest):
         print(f"Chat Endpoint Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    finally:
-        db.close()
-
         
 # --- Serve Frontend Static Files ---
-FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
-app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend", "dist")
+
+@app.middleware("http")
+async def add_frontend_fallback(request, call_next):
+    # This middleware allows React Router to handle its own client-side routes.
+    # If the path doesn't start with /api or /chat, and isn't a static asset file,
+    # we serve index.html
+    response = await call_next(request)
+    if response.status_code == 404 and not request.url.path.startswith("/api") and not request.url.path.startswith("/chat"):
+        index_path = os.path.join(FRONTEND_DIR, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+    return response
+
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
