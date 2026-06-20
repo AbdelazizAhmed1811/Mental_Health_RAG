@@ -5,23 +5,33 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import requests
+
 class TranslatorService:
     def __init__(self):
-        # Load the language classification model
-        model_path = os.getenv("LANG_MODEL_PATH")
-        try:
-            self.lang_model = joblib.load(model_path)
-        except Exception as e:
-            print(f"Warning: Could not load language model at {model_path}: {e}")
-            self.lang_model = None
+        # Use the external Hugging Face Space for language classification
+        self.url = os.getenv("LANG_CLASSIFIER_URL")
+        if not self.url:
+            print("WARNING: LANG_CLASSIFIER_URL is not set. Will default to 'unknown'.")
 
     def detect_language(self, text: str) -> str:
-        """Detect the language of the text using the pre-trained model."""
-        if self.lang_model:
-            # The model pipeline handles text preprocessing and prediction
-            prediction = self.lang_model.predict([text])
-            return prediction[0]
-        else:
+        """Detect the language of the text using the external HF Space API."""
+        if not self.url:
+            return "unknown"
+            
+        try:
+            response = requests.post(
+                f"{self.url}/predict", 
+                json={"text": text}, 
+                timeout=5
+            )
+            response.raise_for_status()
+            
+            data = response.json()
+            return data.get("prediction", "unknown")
+            
+        except Exception as e:
+            print(f"Language detection failed: {e}. Falling back to 'unknown'.")
             return "unknown"
 
     def process_prompt(self, text: str) -> dict:

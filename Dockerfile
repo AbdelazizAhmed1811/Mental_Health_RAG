@@ -32,13 +32,6 @@ COPY backend/ ./backend/
 # ─── Copy built frontend from Stage 1 ────────────────────────────────────────
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# ─── Download the language detection model from Google Drive ─────────────────
-RUN mkdir -p /app/backend/models && \
-    gdown 1d1F4mkjGoYHOCOA9cJd2GL7w7BT9Nfg1 \
-          -O /app/backend/models/language_classification_pipeline.joblib
-
-ENV LANG_MODEL_PATH=/app/backend/models/language_classification_pipeline.joblib
-
 EXPOSE 7860
 
 CMD ["uvicorn", "backend.src.api.main:app", "--host", "0.0.0.0", "--port", "7860"]
