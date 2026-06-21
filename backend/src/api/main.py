@@ -140,7 +140,7 @@ def chat_endpoint(request: ChatRequest, current_user = Depends(get_optional_user
         bot_english = ""
         if intent == "asking_mental_health_question":
             # Detect emotion
-            emotion = emotion_service.classify_emotion(english_query, history=history_str)
+            emotion = emotion_service.classify_emotion(english_query, session_id=request.session_id)
             
             # Generate empathetic response natively in English using Qdrant + LLM
             bot_english = rag_service.generate_response(
