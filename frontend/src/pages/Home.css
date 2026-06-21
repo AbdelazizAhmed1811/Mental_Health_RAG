@@ -85,7 +85,7 @@
   transform: translateX(-50%);
   width: 800px;
   height: 800px;
-  background: radial-gradient(circle, rgba(58, 175, 169, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(58, 175, 169, 0.25) 0%, rgba(139, 92, 246, 0.15) 30%, transparent 70%);
   pointer-events: none;
   animation: glowPulse 4s ease-in-out infinite;
 }
@@ -99,6 +99,32 @@
   position: relative;
   z-index: 1;
   max-width: 720px;
+}
+
+/* Floating Shapes */
+.floating-shape {
+  position: absolute;
+  color: var(--primary-light);
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.shape-1 { top: 15%; left: 10%; width: 60px; color: #f59e0b; animation: floatShape1 8s ease-in-out infinite; }
+.shape-2 { top: 60%; right: 5%; width: 40px; color: #8b5cf6; animation: floatShape2 12s ease-in-out infinite; }
+.shape-3 { bottom: 10%; left: 40%; width: 80px; color: #ec4899; animation: floatShape3 10s ease-in-out infinite; }
+
+@keyframes floatShape1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(20px, -30px) rotate(15deg); }
+}
+@keyframes floatShape2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, 20px) scale(1.2); }
+}
+@keyframes floatShape3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(30px, 10px) rotate(-15deg); }
 }
 
 .hero-badge {
@@ -123,10 +149,16 @@
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, #2b7a78 0%, #3aafa9 20%, #8b5cf6 50%, #ec4899 80%, #3aafa9 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: shine 6s linear infinite;
+}
+
+@keyframes shine {
+  to { background-position: 200% center; }
 }
 
 .hero-subtitle {
@@ -135,21 +167,17 @@
   color: var(--text-muted);
   margin-bottom: 36px;
   max-width: 580px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .hero-actions {
   display: flex;
   gap: 16px;
-  justify-content: center;
   flex-wrap: wrap;
   margin-bottom: 52px;
 }
 
 .hero-stats {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 32px;
 }
@@ -224,9 +252,26 @@
 }
 
 .feature-card-icon {
-  font-size: 2.2rem;
-  margin-bottom: 16px;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 20px;
+  color: var(--primary);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+.feature-card:hover .feature-card-icon {
+  transform: scale(1.15) translateY(-5px);
+}
+
+.features-grid .feature-card:nth-child(1) .feature-card-icon { color: #10b981; }
+.features-grid .feature-card:nth-child(2) .feature-card-icon { color: #8b5cf6; }
+.features-grid .feature-card:nth-child(3) .feature-card-icon { color: #f59e0b; }
+.features-grid .feature-card:nth-child(4) .feature-card-icon { color: #ec4899; }
+
+.features-grid .feature-card:hover:nth-child(1) .feature-card-icon { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4)); }
+.features-grid .feature-card:hover:nth-child(2) .feature-card-icon { filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.4)); }
+.features-grid .feature-card:hover:nth-child(3) .feature-card-icon { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4)); }
+.features-grid .feature-card:hover:nth-child(4) .feature-card-icon { filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.4)); }
 
 .feature-card h3 {
   font-size: 1.1rem;
@@ -247,10 +292,24 @@
   background: linear-gradient(180deg, var(--bg) 0%, var(--primary-pale) 50%, var(--bg) 100%);
 }
 
-.steps {
+.steps-pipeline {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .steps-pipeline::before {
+    content: '';
+    position: absolute;
+    top: 60px;
+    left: 100px;
+    right: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(58, 175, 169, 0.2), transparent);
+    z-index: 0;
+  }
 }
 
 .step-card {
@@ -269,9 +328,32 @@
 }
 
 .step-icon {
-  font-size: 2rem;
-  margin-bottom: 16px;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  color: var(--primary);
+  background: var(--primary-pale);
+  border-radius: 50%;
+  padding: 10px;
+  position: relative;
+  z-index: 1;
+  transition: all 0.4s ease;
 }
+
+.step-card:hover .step-icon {
+  transform: translateY(-5px) scale(1.1);
+}
+
+/* Pipeline Step Colors */
+.steps-pipeline .step-card:nth-child(1) .step-icon { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.steps-pipeline .step-card:nth-child(2) .step-icon { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+.steps-pipeline .step-card:nth-child(3) .step-icon { color: #ec4899; background: rgba(236, 72, 153, 0.1); }
+.steps-pipeline .step-card:nth-child(4) .step-icon { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+
+.steps-pipeline .step-card:hover:nth-child(1) .step-icon { background: #3b82f6; color: white; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+.steps-pipeline .step-card:hover:nth-child(2) .step-icon { background: #8b5cf6; color: white; box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3); }
+.steps-pipeline .step-card:hover:nth-child(3) .step-icon { background: #ec4899; color: white; box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3); }
+.steps-pipeline .step-card:hover:nth-child(4) .step-icon { background: #10b981; color: white; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
 
 .step-card h3 {
   font-size: 1.1rem;
@@ -323,7 +405,7 @@
 .cta-content h2 {
   font-size: 2.5rem;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, #2b7a78 0%, #8b5cf6 50%, #ec4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -411,15 +493,22 @@
 
 .footer-social a {
   color: #a1a1aa;
-  transition: color var(--t-fast);
+  transition: all var(--t-fast);
 }
 
-.footer-social a:hover {
-  color: var(--primary-light);
+.footer-social a:nth-child(1):hover {
+  color: #1da1f2; /* Twitter Blue */
+  transform: scale(1.2);
+}
+
+.footer-social a:nth-child(2):hover {
+  color: #ffffff; /* GitHub White */
+  transform: scale(1.2);
 }
 
 /* ─── Responsive ────────────────────────────────────── */
 @media (max-width: 768px) {
+
   .hero-title {
     font-size: 2rem;
   }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { apiJson, apiFetch } from '../utils/api'
 import SessionList from '../components/SessionList'
@@ -167,10 +168,10 @@ export default function Chat() {
       {/* ─── Sidebar ────────────────────────── */}
       <aside className={`chat-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <div className="sidebar-brand">
+          <Link to="/" className="sidebar-brand" style={{ textDecoration: 'none' }}>
             <span className="brand-icon">🌿</span>
             <span>Companion</span>
-          </div>
+          </Link>
           <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
             ✕
           </button>
@@ -215,10 +216,10 @@ export default function Chat() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
             </button>
             <div>
-              <h1>AI Support Chat</h1>
+              <h1>Your Companion</h1>
               <span className={`status ${isLoading ? 'loading' : ''}`}>
                 <span className="status-dot" />
-                {isLoading ? 'Thinking…' : 'Online'}
+                {isLoading ? 'Typing…' : 'Online'}
               </span>
             </div>
           </div>
@@ -236,51 +237,54 @@ export default function Chat() {
           </div>
         </header>
 
-        {/* Messages */}
-        <div className="chat-messages" ref={chatBoxRef}>
-          {messages.length === 0 && (
-            <div className="welcome-msg">
-              <div className="welcome-icon">🌿</div>
-              <h2>Welcome{user?.display_name ? `, ${user.display_name.split(' ')[0]}` : ''}!</h2>
-              <p>I'm your safe space — here to listen and support your mental well-being. Feel free to share how you're feeling. I understand <strong>20+ languages</strong>, so speak naturally.</p>
+        {/* Centered Wrapper */}
+        <div className="chat-container">
+          {/* Messages */}
+          <div className="chat-messages" ref={chatBoxRef}>
+            {messages.length === 0 && (
+              <div className="welcome-msg">
+                <div className="welcome-icon">🌿</div>
+                <h2>Welcome{user?.display_name ? `, ${user.display_name.split(' ')[0]}` : ''}!</h2>
+                <p>I'm your safe space — here to listen and support your mental well-being. Feel free to share how you're feeling. I understand <strong>20+ languages</strong>, so speak naturally.</p>
+              </div>
+            )}
+
+            {messages.map((msg, i) => (
+              <ChatMessage key={i} message={msg} formatTime={formatTime} />
+            ))}
+
+            {isLoading && <TypingIndicator />}
+          </div>
+
+          {/* Input */}
+          <div className="chat-input-area">
+            <form className="chat-input-form" onSubmit={handleSend}>
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={handleInputResize}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    handleSend(e)
+                  }
+                }}
+                placeholder="Share how you're feeling... (any language)"
+                rows={1}
+                style={{ height: 'auto' }}
+                disabled={isLoading}
+              />
+              <button type="submit" className="send-btn" disabled={!input.trim() || isLoading}>
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </form>
+            <div className="chat-input-meta">
+              <span className="char-count">{input.length > 0 ? `${input.length}` : ''}</span>
+              <span className="disclaimer">Private & secure session · For severe crises, please contact emergency services.</span>
             </div>
-          )}
-
-          {messages.map((msg, i) => (
-            <ChatMessage key={i} message={msg} formatTime={formatTime} />
-          ))}
-
-          {isLoading && <TypingIndicator />}
-        </div>
-
-        {/* Input */}
-        <div className="chat-input-area">
-          <form className="chat-input-form" onSubmit={handleSend}>
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={handleInputResize}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  handleSend(e)
-                }
-              }}
-              placeholder="Share how you're feeling... (any language)"
-              rows={1}
-              style={{ height: 'auto' }}
-              disabled={isLoading}
-            />
-            <button type="submit" className="send-btn" disabled={!input.trim() || isLoading}>
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
-            </button>
-          </form>
-          <div className="chat-input-meta">
-            <span className="char-count">{input.length > 0 ? `${input.length}` : ''}</span>
-            <span className="disclaimer">Private session · AI companion, not a doctor</span>
           </div>
         </div>
       </main>

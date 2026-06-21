@@ -16,10 +16,6 @@ export default function ChatMessage({ message, formatTime }) {
         
         <div className="message-meta">
           <span className="timestamp">{formatTime(message.time)}</span>
-          
-          {isBot && message.meta && message.meta.intent !== 'out_of_scope' && (
-            <span className="meta-pill">✓ RAG Verified</span>
-          )}
         </div>
       </div>
     </div>

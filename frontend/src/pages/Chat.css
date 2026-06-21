@@ -252,6 +252,18 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--chat-bg);
+  background-image: radial-gradient(circle at top right, rgba(58, 175, 169, 0.05), transparent 40%);
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Header */
@@ -423,8 +435,8 @@
 }
 
 .chat-input-form:focus-within {
-  border-color: var(--primary-light);
-  box-shadow: 0 0 0 3px var(--primary-glow);
+  border-color: rgba(58, 175, 169, 0.5);
+  box-shadow: 0 0 15px rgba(58, 175, 169, 0.1);
 }
 
 .chat-input-form textarea {
@@ -581,13 +593,15 @@
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
   color: white;
   border-top-right-radius: 4px;
+  box-shadow: 0 6px 15px rgba(43, 122, 120, 0.2);
 }
 
 .bot-message .message-content {
   background: white;
   color: var(--text-main);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(0,0,0,0.04);
   border-top-left-radius: 4px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.03);
 }
 
 .message-meta {
@@ -609,11 +623,32 @@
   color: var(--text-muted);
 }
 
-.meta-pill {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.7rem;
+/* ─── Typing Indicator ────────────────────────────────── */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.04);
+  border-radius: var(--r-md);
+  border-top-left-radius: 4px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+  width: fit-content;
+}
+
+.typing-indicator .dot {
+  width: 8px;
+  height: 8px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-6px); opacity: 1; }
 }
