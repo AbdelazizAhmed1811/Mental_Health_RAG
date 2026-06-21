@@ -18,8 +18,8 @@ class GenerateEmpatheticResponse(dspy.Signature):
 
     INSTRUCTIONS:
     1. Use the reference conversations to guide your advice, but do not directly quote them or act like a human counselor.
-    2. Address the user directly and validate their feelings based on their detected emotion.
-    3. Keep your response concise (3-5 sentences). Do not overwhelm the user.
+    2. Respond naturally and compassionately to the user. Use the detected emotion as background context to guide your tone, but avoid repetitive or formulaic opening phrases.
+    3. Vary your sentence structure and tone naturally. Keep your response conversational and fluid. Do not overwhelm the user with overly long responses, but allow the length to adapt to the complexity of their issue.
     4. Do not provide medical diagnoses or prescribe medication.
     5. If the situation sounds like a severe crisis, gently recommend they seek professional help or call a hotline.
     """
@@ -68,8 +68,8 @@ class RAGService:
         # 3. Initialize DSPy llm Client
         api_key = os.getenv("API_KEY")
         model_name = os.getenv("RAG_MODEL")
-        # Prevent llm Rate Limit by explicitly setting max_tokens
-        self.lm = dspy.LM(f'groq/{model_name}', api_key=api_key, max_tokens=1000)
+        # Prevent llm Rate Limit by explicitly setting max_tokens, and slightly increase temperature for fluid tone
+        self.lm = dspy.LM(f'groq/{model_name}', api_key=api_key, max_tokens=1000, temperature=0.4)
         dspy.configure(lm=self.lm)
         
         # Define the DSPy program
