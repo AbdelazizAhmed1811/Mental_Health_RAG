@@ -17,6 +17,13 @@ pinned: false
 
 ---
 
+## 🌐 Live Demo
+
+Experience the companion live! The application is fully deployed and accessible via Hugging Face Spaces:
+👉 **[Try the Live Chatbot Here](https://mental-health-rag-org-mental-health-rag.hf.space/chat)**
+
+---
+
 ## 📖 Table of Contents
 
 1. [Project Overview](#-project-overview)
@@ -69,7 +76,7 @@ This project is highly modularized to ensure scalability, ease of development, a
 
 ## 🚀 Key Features & Capabilities
 
-- 🎭 **Real-Time Emotion Recognition**: Every message sent by the user is routed through our custom Emotion API to determine their current mental state (e.g., joy, sadness, fear, anger).
+- 🎭 **Real-Time Emotion Recognition**: Every message sent by the user is routed through our custom Emotion API to determine their current mental state (e.g., joy, sadness, fear, anger). Incorporates **Exponential Moving Average (EMA)** smoothing to stabilize emotional context and gracefully handles varying message lengths.
 - 🧠 **Context-Aware Responses**: By incorporating the user's detected emotion and intent, the core LLM shifts its persona to be as supportive and relevant as possible.
 - 📚 **Knowledge Grounding via RAG**: Halting LLM hallucinations by enforcing strict retrieval of psychological facts and guidelines before replying to the user.
 - ⚡ **Streamlined Execution**: A beautifully automated `start.sh` script spins up the entire local infrastructure with a single command, making developer onboarding frictionless.
@@ -207,25 +214,5 @@ To make life exceptionally easy, we have provided an automated startup script. T
 
 ---
 
-## 📈 Development Roadmap & Future Enhancements
 
-The project is continually evolving. Below is an exhaustive overview of our current priorities (as defined in our `todo.txt`):
-
-### Currently Completed milestones:
-- ✅ **Language Detection Pipeline** (Lead: Abdelaziz)
-- ✅ **Emotion Classification Integration** (Lead: Sokary)
-
-### Active Development (Mandatory Sprint Goals):
-- 🔄 **DSPy Integration**: Refactoring the RAG layer using DSPy to program our language models effectively and reproducibly (Lead: Abdelaziz).
-- 🔄 **Advanced Retrieval Mechanisms**: Researching and implementing the absolute best retrieval methodologies, heavily focusing on combining **Keyword-based Search** and dense **Hybrid Search** algorithms (Lead: Sokary).
-- 🔄 **UI/UX Enhancements**: Dramatically improving the aesthetic and interactivity of the frontend user interface to provide a truly premium and calming experience.
-- 🔄 **Prompt Engineering Mastery**: Reassessing, refining, and rigorously testing the intent classification prompts and final response generation prompts to guarantee a high degree of clinical empathy and safety guardrails.
-- 🔄 **Deployment & DevOps Architecture**:
-  - Fully Dockerizing the project for seamless containerized deployments (Lead: Reda).
-  - Configuring CI/CD pipelines to publish the web application directly onto the Render hosting platform (Lead: Reda).
-
-### Future Pipeline (Optional / Phase 2 Objectives):
-- 🔮 **Persistent User Database**: Integrating a robust relational (PostgreSQL) or NoSQL database to persistently store ongoing user chats, transcripts, and emotional trends over time.
-- 🔮 **Historical Context Integration**: Allowing the chatbot to actively remember past sessions and utilize previous emotional states to provide deep, long-term therapeutic continuity rather than just stateless one-off interactions.
-- 🔮 **Langsmith Observability Framework**: Integrating Langsmith to trace, evaluate, and monitor the LLM applications in real time, giving us unparalleled insight into latency, token usage, and answer quality.
 

@@ -36,14 +36,6 @@ class EmotionClassifierService:
         if not self.url or self.url == "your_ngrok_url_here":
             return "neutral"
             
-        # If length of sent prompt < 4 words, skip DistilBERT execution entirely.
-        if len(text.split()) < 4:
-            if session_id and session_id in self.session_ema:
-                ema_state = self.session_ema[session_id]
-                best_idx = max(range(len(ema_state)), key=ema_state.__getitem__)
-                return self.idx_to_emotion[best_idx]
-            return "neutral"
-            
         try:
             # Pass ONLY the Latest Message to DistilBERT
             response = requests.post(f"{self.url}/predict", json={"text": text}, timeout=10)
