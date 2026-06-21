@@ -101,7 +101,7 @@ def delete_session(session_id: str, current_user = Depends(auth.get_current_user
     crud.delete_session(db, session_id, current_user.id)
     return {"status": "deleted"}
 
-@app.post("/chat", response_model=ChatResponse)
+@app.post("/api/chat", response_model=ChatResponse)
 def chat_endpoint(request: ChatRequest, current_user = Depends(get_optional_user), db = Depends(auth.get_db)):
     try:
         raw_query = PreprocessingService.preprocess_query(request.query)
@@ -191,7 +191,7 @@ async def add_frontend_fallback(request, call_next):
     # If the path doesn't start with /api or /chat, and isn't a static asset file,
     # we serve index.html
     response = await call_next(request)
-    if response.status_code == 404 and not request.url.path.startswith("/api") and not request.url.path.startswith("/chat"):
+    if response.status_code == 404 and not request.url.path.startswith("/api"):
         index_path = os.path.join(FRONTEND_DIR, "index.html")
         if os.path.exists(index_path):
             return FileResponse(index_path)

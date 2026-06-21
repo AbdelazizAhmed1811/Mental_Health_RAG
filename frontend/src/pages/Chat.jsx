@@ -111,7 +111,7 @@ export default function Chat() {
     setIsLoading(true)
 
     try {
-      const res = await apiFetch('/chat', {
+      const res = await apiFetch('/api/chat', {
         method: 'POST',
         body: JSON.stringify({ query: text, session_id: activeSessionId })
       })
