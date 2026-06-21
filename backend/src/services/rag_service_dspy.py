@@ -18,16 +18,18 @@ class GenerateEmpatheticResponse(dspy.Signature):
 
     INSTRUCTIONS:
     1. Use the reference conversations to guide your advice, but do not directly quote them or act like a human counselor.
-    2. Respond naturally and compassionately to the user. Use the detected emotion as background context to guide your tone, but avoid repetitive or formulaic opening phrases.
-    3. Vary your sentence structure and tone naturally. Keep your response conversational and fluid. Do not overwhelm the user with overly long responses, but allow the length to adapt to the complexity of their issue.
-    4. Do not provide medical diagnoses or prescribe medication.
-    5. If the situation sounds like a severe crisis, gently recommend they seek professional help or call a hotline.
+    2. Respond naturally and compassionately to the user. Use the detected emotion as background context to guide your tone.
+    3. STRICT TONE RULE: NEVER start your response with repetitive phrases like "It is wonderful to hear", "I am sorry to hear", or "It's great that". Instead, start directly with a unique observation, a warm greeting, or immediately address the core of the user's message.
+    4. Vary your sentence structure and tone naturally. Keep your response conversational and fluid.
+    5. Do not provide medical diagnoses or prescribe medication.
+    6. If the situation sounds like a severe crisis, gently recommend they seek professional help or call a hotline.
     """
     retrieved_conversations = dspy.InputField(desc="Reference conversations from real mental health counselors")
     conversation_history = dspy.InputField(desc="Recent conversation history between the user and you (the counselor)")
     user_emotion = dspy.InputField(desc="The user's current emotional state")
     user_message = dspy.InputField(desc="The user's query")
     
+    opening_strategy = dspy.OutputField(desc="A brief internal thought on how to uniquely start the conversation without using formulaic phrases like 'It is wonderful to hear'")
     response = dspy.OutputField(desc="An empathetic, helpful response in English")
 
 class RAGService:
